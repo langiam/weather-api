@@ -1,7 +1,8 @@
 import dotenv from 'dotenv';
-import express from 'express';
 import path from 'node:path';
+import express from 'express'
 import { fileURLToPath } from 'node:url';
+import { Request, Response } from 'express';
 
 dotenv.config();
 
@@ -24,7 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 // TODO: Implement middleware to connect the routes
 app.use(routes);
 
-app.get('*', (req: Request, res: Response) => {
+app.get('*', (_req: Request, res: Response) => {
     res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
 }
 );
