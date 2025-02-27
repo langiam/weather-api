@@ -57,7 +57,7 @@ class WeatherService {
 
   // TODO: Create buildGeocodeQuery method
   private buildGeocodeQuery(city: string): string {
-        return `https://api.openweathermap.org/geo/1.0/direct?q=${encodedURIComponent(city)}&limit=1&appid=${this.apiKey}`;
+        return `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(city)}&limit=1&appid=${this.apiKey}`;
   }
 
   // TODO: Create buildWeatherQuery method
@@ -99,7 +99,7 @@ class WeatherService {
   }
 
   // TODO: Complete buildForecastArray method
-  private buildForecastArray(currentWeather: Weather, weatherData: any[]) {
+  private buildForecastArray(weatherData: any[]) {
     return weatherData.slice(1).map((data:any) => {
       const temperature = data.main.temp;
       const humidity = data.main.humidity;
