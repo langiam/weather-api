@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
-import express from 'express';
 import path from 'node:path';
+import express from 'express';
 import { fileURLToPath } from 'node:url';
 dotenv.config();
 // Import the routes
@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // TODO: Implement middleware to connect the routes
 app.use(routes);
-app.get('*', (req, res) => {
+app.get('*', (_req, res) => {
     res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
 });
 // Start the server on the port
