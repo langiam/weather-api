@@ -34,31 +34,41 @@ API Calls
 
 */
 
-const fetchWeather = async (cityName: string) => {
-  const response = await fetch('/api/weather/', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ cityName }),
-  });
+const fetchWeather = async (city: string) => {
+  try {
+    const response = await fetch('/api/weather/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ city }),
+    });
 
-  const weatherData = await response.json();
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
 
-  console.log('weatherData: ', weatherData);
+    const weatherData = await response.json();
+    console.log('weatherData: ', weatherData);
 
-  renderCurrentWeather(weatherData[0]);
-  renderForecast(weatherData.slice(1));
+  
+    renderCurrentWeather(weatherData.current);
+    renderForecast(weatherData.forecast);
+  } catch (error) {
+    console.error('Error fetching weather:', error);
+    alert('Failed to fetch weather data. Please check your input and try again.');
+  }
 };
 
 const fetchSearchHistory = async () => {
-  const history = await fetch('/api/weather/history', {
+  const response = await fetch('/api/weather/history', {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
     },
   });
-  return history;
+
+  return response.json();
 };
 
 const deleteCityFromHistory = async (id: string) => {
@@ -68,6 +78,8 @@ const deleteCityFromHistory = async (id: string) => {
       'Content-Type': 'application/json',
     },
   });
+
+  getAndRenderHistory(); 
 };
 
 /*
@@ -100,6 +112,8 @@ const renderCurrentWeather = (currentWeather: any): void => {
 };
 
 const renderForecast = (forecast: any): void => {
+  if (!forecast.length) return;
+  
   const headingCol = document.createElement('div');
   const heading = document.createElement('h4');
 
