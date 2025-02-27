@@ -26,7 +26,7 @@ class Weather {
 class WeatherService {
   // Define the baseURL and API key properties
   private baseURL: string = 'https://api.openweathermap.org/data/2.5/';
-  private apiKey: string = process.env.WEATHER_API_KEY || '';
+  private apiKey: string = process.env.API_KEY || '';
 
   constructor() {
     if (!this.apiKey) {
@@ -35,7 +35,6 @@ class WeatherService {
     }
   }
 
-  // TODO: Create fetchLocationData method
   async fetchLocationData(city: string): Promise<any> {
     const geocodeQuery = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(city)}&limit=1&appid=${this.apiKey}`;
     console.log("🔎 Fetching Location Data:", geocodeQuery);
@@ -64,24 +63,21 @@ class WeatherService {
     return { lat, lon };
   }
 
-  // TODO: Create buildGeocodeQuery method
-  private buildGeocodeQuery(city: string): string {
-    return `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(city)}&limit=1&appid=${this.apiKey}`;
-  }
-
-  // TODO: Create buildWeatherQuery method
-  private buildWeatherQuery(coordinates: Coordinates): string {
+// @ts-ignore: Unused function for future use.
+private buildGeocodeQuery(city: string): string {
+  return `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(city)}&limit=1&appid=${this.apiKey}`;
+}
+ 
+private buildWeatherQuery(coordinates: Coordinates): string {
     return `${this.baseURL}forecast?lat=${coordinates.lat}&lon=${coordinates.lon}&appid=${this.apiKey}&units=metric`;
   }
 
-  // TODO: Create fetchAndDestructureLocationData method
   async fetchAndDestructureLocationData(city: string): Promise<Coordinates> {
     console.log(`Fetching and destructuring location data for ${city}`);
      const locationData = await this.fetchLocationData(city);
     return this.destructureLocationData(locationData);
   }
 
-  // TODO: Create fetchWeatherData method
   private async fetchWeatherData(coordinates: Coordinates): Promise<any> {
     const weatherQuery = this.buildWeatherQuery(coordinates);
     console.log("🌤️ Fetching Weather Data:", weatherQuery);
