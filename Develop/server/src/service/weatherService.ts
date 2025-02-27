@@ -89,23 +89,24 @@ class WeatherService {
   }
   // TODO: Build parseCurrentWeather method
   private parseCurrentWeather(response: any): Weather {
-    return weatherData.slice(1).map((data: any) => {
-      const temperature = data.main.temp;
-      const humidity = data.main.humidity;
-      const windSpeed = data.wind.speed;
-      const description = data.weather[0].description;
-      return new Weather(temperature, humidity, windSpeed, description);
-    });
+    const data = response.list[0];
+    return new Weather(
+       data.main.temp,
+       data.main.humidity,
+       data.wind.speed,
+       data.weather[0].description
+   );
   }
 
   // TODO: Complete buildForecastArray method
-  private buildForecastArray(weatherData: any[]) {
-    return weatherData.slice(1).map((data:any) => {
-      const temperature = data.main.temp;
-      const humidity = data.main.humidity;
-      const windSpeed = data.wind.speed;
-      const description = data.weather[0].description;
-      return new Weather(temperature, humidity, windSpeed, description);
+  private buildForecastArray(weatherData: any[]): Weather[] {
+    return weatherData.map((data: any) => {
+      return new Weather(
+        data.main.temp,
+        data.main.humidity,
+        data.wind.speed,
+        data.weather[0].description
+      );
     });
   }
   // TODO: Complete getWeatherForCity method
@@ -113,7 +114,7 @@ class WeatherService {
     const coordinates = await this.fetchAndDestructureLocationData(city);
     const weatherResponse = await this.fetchWeatherData(coordinates);
     const current = this.parseCurrentWeather(weatherResponse);
-    const forecast = this.buildForecastArray(current, weatherResponse.list);
+    const forecast = this.buildForecastArray(weatherResponse.list);
     return { current, forecast };
   }
 }
