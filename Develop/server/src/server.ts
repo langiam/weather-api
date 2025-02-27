@@ -4,6 +4,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import { fileURLToPath } from 'node:url';
 import weatherRoutes from './routes/api/weatherRoutes.js';
+import fs from 'fs';
 
 
 dotenv.config();
@@ -39,14 +40,25 @@ app.use((req, res, next) => {
 });
 
 
-app.use(express.static(path.resolve(__dirname, '../client/dist')));
+app.use(express.static(path.resolve(__dirname, '../../client/dist')));
 
 // TODO: Implement middleware to connect the routes
 app.use('/api/weather', weatherRoutes); 
 
 app.get('*', (_req: Request, res: Response) => {
-    res.sendFile(path.resolve(__dirname, '../client/dist/index.html'));
+    const indexPath = path.resolve(__dirname, '../../client/dist/index.html');
+
+    if (!fs.existsSync(indexPath)) {
+        console.error('❌ Error: Frontend build missing (client/dist/index.html not found)');
+        return res.status(500).send({
+            error: 'Frontend build missing',
+            message: 'Please run `npm run build` in the client directory before starting the server.',
+        });
+    }
+
+    return res.sendFile(indexPath);
 });
+
 
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
     console.error('Server Error:', err.stack);

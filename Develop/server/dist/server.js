@@ -4,22 +4,26 @@ import express from 'express';
 import cors from 'cors';
 import { fileURLToPath } from 'node:url';
 import weatherRoutes from './routes/api/weatherRoutes.js';
-
+import fs from 'fs';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+// Import the routes
 
 // TODO: Serve static files of entire client dist folder
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const clientDistPath = path.resolve(__dirname, '../../client/dist');
+
+app.use(express.static(clientDistPath));
 
 // TODO: Implement middleware for parsing JSON and urlencoded form data
 app.use(cors());
 app.options('*', (_req, res) => {
     res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     res.sendStatus(200);
 });
@@ -27,26 +31,23 @@ app.options('*', (_req, res) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use((req, res, next) => {
-    if (req.path.endsWith('.js')) {
-        res.setHeader('Content-Type', 'application/javascript');
-    } else if (req.path.endsWith('.css')) {
-        res.setHeader('Content-Type', 'text/css');
-    }
-    next();
-});
-
-app.use(express.static(path.resolve(__dirname, '../client/dist')));
-
 // TODO: Implement middleware to connect the routes
 app.use('/api/weather', weatherRoutes);
 
+
 app.get('*', (_req, res) => {
-    res.sendFile(path.resolve(__dirname, '../client/dist/index.html'));
+    const indexPath = path.resolve(clientDistPath, 'index.html');
+
+    if (!fs.existsSync(indexPath)) {  
+        console.error('❌ Error: Frontend build missing (client/dist/index.html not found)');
+        return res.status(500).send('Error: Frontend is not built. Please run `npm run build` in the client directory.');
+    }
+
+    res.sendFile(indexPath);
 });
 
-app.use((err, _req, res, _next) => {
-    console.error('Server Error:', err.stack);
+app.use((err, req, res, _next) => {
+    console.error(`❌ Server Error at ${req.path}:`, err.stack);
     res.status(500).json({ message: 'Internal Server Error' });
 });
 
